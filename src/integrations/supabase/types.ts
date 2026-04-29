@@ -14,16 +14,234 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          metadata: Json
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          created_at: string
+          extension: string | null
+          filename: string
+          id: string
+          mime_type: string | null
+          original_name: string
+          size: number
+          status: Database["public"]["Enums"]["doc_status"]
+          storage_path: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          extension?: string | null
+          filename: string
+          id?: string
+          mime_type?: string | null
+          original_name: string
+          size?: number
+          status?: Database["public"]["Enums"]["doc_status"]
+          storage_path: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          extension?: string | null
+          filename?: string
+          id?: string
+          mime_type?: string | null
+          original_name?: string
+          size?: number
+          status?: Database["public"]["Enums"]["doc_status"]
+          storage_path?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          document_id: string
+          error_message: string | null
+          id: string
+          logs: Json
+          progress: number
+          retry_count: number
+          stage: Database["public"]["Enums"]["job_stage"]
+          started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          document_id: string
+          error_message?: string | null
+          id?: string
+          logs?: Json
+          progress?: number
+          retry_count?: number
+          stage?: Database["public"]["Enums"]["job_stage"]
+          started_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          document_id?: string
+          error_message?: string | null
+          id?: string
+          logs?: Json
+          progress?: number
+          retry_count?: number
+          stage?: Database["public"]["Enums"]["job_stage"]
+          started_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      results: {
+        Row: {
+          created_at: string
+          document_id: string
+          extracted_json: Json
+          finalized: boolean
+          finalized_at: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          extracted_json?: Json
+          finalized?: boolean
+          finalized_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          extracted_json?: Json
+          finalized?: boolean
+          finalized_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "results_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: true
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      doc_status: "queued" | "processing" | "completed" | "failed" | "finalized"
+      job_stage:
+        | "queued"
+        | "started"
+        | "parsing_started"
+        | "parsing_completed"
+        | "extraction_started"
+        | "extraction_completed"
+        | "storing_result"
+        | "completed"
+        | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +368,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      doc_status: ["queued", "processing", "completed", "failed", "finalized"],
+      job_stage: [
+        "queued",
+        "started",
+        "parsing_started",
+        "parsing_completed",
+        "extraction_started",
+        "extraction_completed",
+        "storing_result",
+        "completed",
+        "failed",
+      ],
+    },
   },
 } as const
